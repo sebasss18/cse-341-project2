@@ -5,7 +5,7 @@ const doc = {
     title: "Library API",
     description: "API for managing books and authors",
   },
-  host: "localhost:3000",
+  host: "https://cse-341-project2-live.onrender.com/Project2",
   schemes: ["http"],
 };
 
