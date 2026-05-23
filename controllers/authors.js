@@ -39,68 +39,80 @@ const getSingle = async (req, res) => {
 
 const createAuthor = async (req, res) => {
   //#swagger.tags=['Authors']
-  const author = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    nationality: req.body.nationality,
-    birthYear: req.body.birthYear,
-    genres: req.body.genres,
-    active: req.body.active,
-  };
-
-  const response = await mongodb
-    .getDatabase()
-    .db()
-    .collection("authors")
-    .insertOne(author);
-
-  if (response.acknowledged) {
-    res.status(201).send();
-  } else {
-    res.status(500).json(response.error || "Error creating author.");
+  try {
+    const author = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      nationality: req.body.nationality,
+      birthYear: req.body.birthYear,
+      genres: req.body.genres,
+      active: req.body.active,
+    };
+  
+    const response = await mongodb
+      .getDatabase()
+      .db()
+      .collection("authors")
+      .insertOne(author);
+  
+    if (response.acknowledged) {
+      res.status(201).send();
+    } else {
+      res.status(500).json(response.error || "Error creating author.");
+    }
+  } catch (err) {
+    res.status(400).json({message: err.message});
   }
 };
 
 const updateAuthor = async (req, res) => {
   //#swagger.tags=['Authors']
-  const authorId = new ObjectId(req.params.id);
-
-  const author = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    nationality: req.body.nationality,
-    birthYear: req.body.birthYear,
-    genres: req.body.genres,
-    active: req.body.active,
-  };
-
-  const response = await mongodb
-    .getDatabase()
-    .db()
-    .collection("authors")
-    .replaceOne({ _id: authorId }, author);
-
-  if (response.modifiedCount > 0) {
-    res.status(204).send();
-  } else {
-    res.status(500).json(response.error || "Error updating author.");
+  try {
+    const authorId = new ObjectId(req.params.id);
+  
+    const author = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      nationality: req.body.nationality,
+      birthYear: req.body.birthYear,
+      genres: req.body.genres,
+      active: req.body.active,
+    };
+  
+    const response = await mongodb
+      .getDatabase()
+      .db()
+      .collection("authors")
+      .replaceOne({ _id: authorId }, author);
+  
+    if (response.modifiedCount > 0) {
+      res.status(204).send();
+    } else {
+      res.status(404).json(response.error || "Error updating author.");
+    }
+  } catch (err) {
+    res.status(400).json({ message: err.message});
   }
 };
 
 const deleteAuthor = async (req, res) => {
   //#swagger.tags=['Authors']
-  const authorId = new ObjectId(req.params.id);
-
-  const response = await mongodb
-    .getDatabase()
-    .db()
-    .collection("authors")
-    .deleteOne({ _id: authorId });
-
-  if (response.deletedCount > 0) {
-    res.status(204).send();
-  } else {
-    res.status(500).json(response.error || "Error deleting author.");
+  try {
+    const authorId = new ObjectId(req.params.id);
+  
+    const response = await mongodb
+      .getDatabase()
+      .db()
+      .collection("authors")
+      .deleteOne({ _id: authorId });
+  
+    if (response.deletedCount > 0) {
+      res.status(204).send();
+    } else {
+      res.status(404).json(response.error || "Error deleting author.");
+    }
+  } catch (err) {
+    res.status(400).json({ message: err.message});
   }
 };
 
