@@ -5,7 +5,7 @@ const doc = {
     title: "Library API",
     description: "API for managing books and authors",
   },
-  host: "localhost:3001",
+  host: "localhost:3000",
   schemes: ["http"],
 };
 
