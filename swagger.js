@@ -5,8 +5,8 @@ const doc = {
     title: "Library API",
     description: "API for managing books and authors",
   },
-  host: "https://cse-341-project2-live.onrender.com/Project2",
-  schemes: ["http"],
+  host: "cse-341-project2-live.onrender.com",
+  schemes: ["https"],
 };
 
 const outputFile = "./swagger.json";
