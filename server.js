@@ -7,37 +7,35 @@ const GitHubStrategy = require("passport-github").Strategy;
 const cors = require("cors");
 
 const app = express();
-
 const port = process.env.PORT || 3000;
 
-app
-  .use(bodyParser.json())
-  .use(
-    session({
-      secret: "secret",
-      resave: false,
-      saveUninitialized: false,
-    }),
-  )
-  .use(passport.initialize())
-  .use(passport.session())
-  .use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept, Z-Key, Authorization",
-    );
+app.set("trust proxy", 1);
 
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "POST, GET, PUT, PATCH, OPTIONS, DELETE",
-    );
+app.use(bodyParser.json());
 
-    next();
-  })
-  .use(cors({ methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"] }))
-  .use(cors({ origin: "*" }))
-  .use("/", require("./routes/index.js"));
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,
+      sameSite: "none",
+    },
+  }),
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
+
+app.use("/", require("./routes/index.js"));
 
 passport.use(
   new GitHubStrategy(
@@ -61,11 +59,7 @@ passport.deserializeUser((user, done) => {
 });
 
 app.get("/", (req, res) => {
-  res.send(
-    req.user !== undefined
-      ? `Logged in as ${req.user.displayName}`
-      : "Logged Out",
-  );
+  res.send(req.user ? `Logged in as ${req.user.displayName}` : "Logged Out");
 });
 
 app.get(
