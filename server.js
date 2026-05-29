@@ -7,35 +7,40 @@ const GitHubStrategy = require("passport-github").Strategy;
 const cors = require("cors");
 
 const app = express();
+
 const port = process.env.PORT || 3000;
 
-app.set("trust proxy", 1);
+app
+  .use(bodyParser.json())
+  .use(
+    session({
+      secret: "secret",
+      resave: false,
+      saveUninitialized: true,
+    }),
+  )
+  // This is the basic express session({...}) initialization.
+  .use(passport.initialize())
+  // init passport on every route call.
+  .use(passport.session())
+  // allow passport to use "express-session".
+  .use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Z-Key, Authorization",
+    );
 
-app.use(bodyParser.json());
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "POST, GET, PUT, PATCH, OPTIONS, DELETE",
+    );
 
-app.use(
-  session({
-    secret: "secret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: true,
-      sameSite: "none",
-    },
-  }),
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  }),
-);
-
-app.use("/", require("./routes/index.js"));
+    next();
+  })
+  .use(cors({ methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"] }))
+  .use(cors({ origin: "*" }))
+  .use("/", require("./routes/index.js"));
 
 passport.use(
   new GitHubStrategy(
@@ -59,15 +64,21 @@ passport.deserializeUser((user, done) => {
 });
 
 app.get("/", (req, res) => {
-  res.send(req.user ? `Logged in as ${req.user.displayName}` : "Logged Out");
+  res.send(
+    req.session.user !== undefined
+      ? `Logged in as ${req.session.user.displayName}`
+      : "Logged Out",
+  );
 });
 
 app.get(
   "/github/callback",
   passport.authenticate("github", {
     failureRedirect: "/api-docs",
+    session: false,
   }),
   (req, res) => {
+    req.session.user = req.user;
     res.redirect("/");
   },
 );
