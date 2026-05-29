@@ -19,7 +19,7 @@ router.get("/status", (req, res) => {
 router.use("/books", require("./books"));
 router.use("/authors", require("./authors"));
 
-router.get("/login", passport.authenticate("github"), (req, res) => {});
+router.get("/login", passport.authenticate("github"));
 
 router.get("/logout", function (req, res, next) {
   req.logout(function (err) {
