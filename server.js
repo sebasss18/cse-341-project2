@@ -16,14 +16,11 @@ app
     session({
       secret: "secret",
       resave: false,
-      saveUninitialized: true,
+      saveUninitialized: false,
     }),
   )
-  // This is the basic express session({...}) initialization.
   .use(passport.initialize())
-  // init passport on every route call.
   .use(passport.session())
-  // allow passport to use "express-session".
   .use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
@@ -65,8 +62,8 @@ passport.deserializeUser((user, done) => {
 
 app.get("/", (req, res) => {
   res.send(
-    req.session.user !== undefined
-      ? `Logged in as ${req.session.user.displayName}`
+    req.user !== undefined
+      ? `Logged in as ${req.user.displayName}`
       : "Logged Out",
   );
 });
@@ -77,7 +74,6 @@ app.get(
     failureRedirect: "/api-docs",
   }),
   (req, res) => {
-    req.session.user = req.user;
     res.redirect("/");
   },
 );

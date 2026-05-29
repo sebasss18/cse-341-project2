@@ -9,8 +9,8 @@ router.get("/", (req, res) => {
 });
 
 router.get("/status", (req, res) => {
-  if (req.session.user) {
-    res.send(`Logged in as ${req.session.user.displayName}`);
+  if (req.user) {
+    res.send(`Logged in as ${req.user.displayName}`);
   } else {
     res.send("Logged Out");
   }
